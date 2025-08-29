@@ -1,5 +1,5 @@
 from django.db import models
-from exams.models import *
+from exams.models import Exam
 
 # Create your models here.
 class Examinee(models.Model):

@@ -83,10 +83,12 @@ DATABASES = {
         'USER': env("DB_USER"),
         'PASSWORD': env("DB_PASSWORD"),
         'HOST': env("DB_HOST"),
-        'POST': env("DB_PORT")
+        'PORT': env("DB_PORT"),
+        'OPTIONS': {
+            'ssl': {'ca': str(BASE_DIR / 'certs/ca.pem')}
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

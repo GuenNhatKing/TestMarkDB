@@ -2,14 +2,6 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
-class User(models.Model):
-    username = models.CharField(max_length=64, unique=True)
-    salt = models.BinaryField(max_length=32)
-    hashed = models.CharField(max_length=64)
-
-    def __str__(self):
-        return self.username
-
 class Examinee(models.Model):
     name = models.CharField(max_length=128)
     date_of_birth = models.DateField()

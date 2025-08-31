@@ -1,7 +1,12 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-
+from django.contrib.auth.models import AbstractUser
 # Create your models here.
+
+class CustomUser(AbstractUser):
+    email = models.EmailField(unique=True)
+    isVerificated = models.BooleanField(default=False) # Email verificate
+
 class Examinee(models.Model):
     name = models.CharField(max_length=128)
     date_of_birth = models.DateField()

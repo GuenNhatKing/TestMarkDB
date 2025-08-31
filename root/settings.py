@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -43,8 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'authentication',
-    'exams',
+    'rest_framework_simplejwt',
+    'rest_framework',
+    'app'
 ]
 
 MIDDLEWARE = [
@@ -134,3 +136,30 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+signing_key_file = open(BASE_DIR / "certs/pkcs8.key")
+signing_key = signing_key_file.read()
+verifying_key_file = open(BASE_DIR / "certs/publickey.crt")
+verifying_key = verifying_key_file.read()
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+
+    "ALGORITHM": "RS512",
+    "SIGNING_KEY": signing_key,
+    "VERIFYING_KEY": verifying_key,
+
+    "AUDIENCE": "TestMarkDBUser",
+    "ISSUER": "TestMarkDB",
+
+    "TOKEN_OBTAIN_SERIALIZER": "authentication.serializers.CustomTokenObtainPairSerializer",
+
+    # Default setting: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+}

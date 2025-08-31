@@ -160,3 +160,7 @@ SIMPLE_JWT = {
     "ISSUER": "TestMarkDB",
     # Default setting: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
 }
+
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+]

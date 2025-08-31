@@ -158,8 +158,5 @@ SIMPLE_JWT = {
 
     "AUDIENCE": "TestMarkDBUser",
     "ISSUER": "TestMarkDB",
-
-    "TOKEN_OBTAIN_SERIALIZER": "authentication.serializers.CustomTokenObtainPairSerializer",
-
     # Default setting: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
 }

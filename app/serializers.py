@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import *
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -16,4 +16,14 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             password=validated_data["password"]
         )
         return user
+    
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email')
+    
+class ExamSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Exam
+        exclude = ('user',) # Get all field exclude 'user'
 

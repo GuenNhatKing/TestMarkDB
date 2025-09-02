@@ -2,7 +2,8 @@ from django.shortcuts import render
 from rest_framework import generics, status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from .permissions import IsVerificated
 from .models import *
 from .serializers import *
 
@@ -17,6 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 class ExamViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, IsVerificated]
     serializer_class = ExamSerializer
 
     def get_queryset(self):

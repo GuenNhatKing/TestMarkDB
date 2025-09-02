@@ -20,7 +20,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('username', 'email')
+        fields = ('username', 'email', 'isVerificated')
     
 class ExamSerializer(serializers.ModelSerializer):
     class Meta: 

@@ -8,6 +8,7 @@ class CustomUser(AbstractUser):
     isVerificated = models.BooleanField(default=False) # Email verificate
 
 class Examinee(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
     date_of_birth = models.DateField()
 
@@ -15,6 +16,7 @@ class Examinee(models.Model):
         return f"{self.name} ({self.date_of_birth})"
 
 class Exam(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
     exam_date = models.DateField()
     duration = models.DurationField()

@@ -6,6 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .permissions import IsVerificated
 from .models import *
 from .serializers import *
+from .tasks import send_otp
 
 # Create your views here.
 class RegisterView(generics.CreateAPIView):
@@ -28,3 +29,8 @@ class ExamViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
         return super().perform_create(serializer)
+    
+class EmailVerify(APIView):
+    def get(self, request):
+        send_otp.delay(request.user.email)
+        return Response('Đã gửi otp')

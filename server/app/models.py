@@ -7,6 +7,9 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     isVerificated = models.BooleanField(default=False) # Email verificate
 
+    def __str__(self):
+        return f"{self.username} ({self.email})"
+    
 class Examinee(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=128)

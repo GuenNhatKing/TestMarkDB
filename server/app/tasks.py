@@ -13,8 +13,7 @@ environ.Env.read_env(BASE_DIR / ".env")
 # Document for send email: https://mailtrap.io/blog/python-send-email/
 
 @shared_task
-def send_otp(receiver):
-    otp_code = randomX.randomOTP()
+def send_otp(receiver, otp_code):
     subject = 'Mã OTP của bạn từ TestMarkDB'
     body = f"""
         <!DOCTYPE html>
@@ -101,4 +100,4 @@ def send_otp(receiver):
         smtp.login(env("SMTP_USERNAME"), env("SMTP_PASSWORD"))
         smtp.send_message(message)
 
-    print("Email đã gửi thành công!")
+    print(f"OTP was sent for email: {receiver}!")

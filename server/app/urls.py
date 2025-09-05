@@ -8,6 +8,8 @@ router.register('exams', ExamViewSet, basename='exam')
 
 urlpatterns = [
     path("api/register", RegisterView.as_view(), name="Register"),
-    path("api/emailverify", EmailVerify.as_view(), name="EmailVerify"),
+    path("api/SendOTPForEmailVerify", SendOTPForEmailVerify.as_view(), name="SendOTPForEmailVerify"),
+    path("api/VerifyOTP", VerifyOTP.as_view(), name="VerifyOTP"),
+    path("api/VerifyEmail", VerifyEmail.as_view(), name="VerifyEmail"),
     path("api/", include(router.urls))
 ]

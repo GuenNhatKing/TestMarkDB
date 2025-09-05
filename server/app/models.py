@@ -61,3 +61,23 @@ class ExamineePaper(models.Model):
     def __str__(self):
         mark = "Correct" if self.mark_result else "Wrong"
         return f"{self.examinee.name} - {self.exam_paper} Q{self.question_number}: A{self.answer_number} ({mark})"
+    
+class Request(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    token = models.CharField(max_length=24, primary_key=True)
+    action = models.CharField(max_length=64)
+    available = models.BooleanField()
+    expired_at = models.DateTimeField()
+
+    def __str__(self):
+        return f'{self.user.email} {self.action} ({self.token})'
+
+class OTPRequest(models.Model):
+    code = models.CharField(max_length=4)
+    request = models.ForeignKey(Request, on_delete=models.CASCADE)
+    created_at = models.DateTimeField()
+    expired_at = models.DateTimeField()
+
+    def __str__(self):
+        return f'{self.request.user.email} ({self.code})'
+    

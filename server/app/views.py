@@ -7,6 +7,8 @@ from .permissions import IsVerificated
 from .models import *
 from .serializers import *
 from .tasks import send_otp
+from app import randomX
+from datetime import datetime, timedelta
 
 # Create your views here.
 class RegisterView(generics.CreateAPIView):
@@ -30,7 +32,71 @@ class ExamViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
         return super().perform_create(serializer)
     
-class EmailVerify(APIView):
-    def get(self, request):
-        send_otp.delay(request.user.email)
-        return Response('Đã gửi otp')
+class SendOTPForEmailVerify(APIView):
+    def post(self, request):
+        action_request = Request.objects.filter(
+            user = request.user,
+            available = False,
+            expired_at__gt = datetime.now(),
+            action='email_verify'
+        ).first()
+
+        if action_request is None:
+            token = ''.join(map(str, [randomX.base62[x] for x in randomX.randomX(24, 0, 62)]))
+            action_request = Request(user=request.user, token=token, action='email_verify', expired_at=datetime.now() + timedelta(minutes=5), available=False)
+            action_request.save()
+
+        otp_code = randomX.randomOTP()
+        otp_request = OTPRequest(code=otp_code, request=action_request, created_at=datetime.now(), expired_at=datetime.now() + timedelta(minutes=5))
+        otp_request.save()
+
+        serializer = OTPRequestSerializer(otp_request)
+
+        send_otp.delay_on_commit(action_request.user.email, otp_code)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+class VerifyOTP(APIView):
+    def patch(self, request):
+        serializer = OTPVerifySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        code = serializer.validated_data['code']
+        token = serializer.validated_data['token']
+
+        action_request = Request.objects.filter(token=token, available=False, expired_at__gt = datetime.now()).first()
+        if action_request is None:
+            return Response({"detail": "Token không hợp lệ"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        otp_request = OTPRequest.objects.filter(
+            request=action_request,
+            code = code,
+            expired_at__gt = datetime.now()
+        ).first()
+
+        if otp_request is None:
+            return Response({"detail": "OTP không hợp lệ hoặc đã hết hạn"}, status=status.HTTP_400_BAD_REQUEST)
+
+        action_request.available = True
+        action_request.save()
+        serializer = RequestSerializer(action_request)
+
+        otp_request.delete()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class VerifyEmail(APIView):
+    def patch(self, request):
+        serializer = EmailVerifySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data['token']
+
+        action_request = Request.objects.filter(token=token, available=True, expired_at__gt = datetime.now()).first()
+        if action_request is None:
+            return Response({"detail": "Token không hợp lệ"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = CustomUser.objects.filter(username=action_request.user.username).first()
+        user.isVerificated = True
+        user.save()
+        action_request.delete()
+        return Response({"detail": "Xác thực email thành công"}, status=status.HTTP_200_OK)

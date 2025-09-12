@@ -12,7 +12,7 @@ class CustomUser(AbstractUser):
     
 class Examinee(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=127)
     date_of_birth = models.DateField()
 
     def __str__(self):
@@ -20,7 +20,9 @@ class Examinee(models.Model):
 
 class Exam(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=127)
+    subject = models.CharField(max_length=127, null=True)
+    description = models.TextField(null = True)
     exam_date = models.DateField()
     duration = models.DurationField()
 
@@ -31,6 +33,8 @@ class ExamineeList(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     examinee = models.ForeignKey(Examinee, on_delete=models.CASCADE)
     score = models.FloatField()
+    img_before_process = models.CharField(max_length=255, null=True)
+    img_after_process = models.CharField(max_length=255, null=True)
     
     def __str__(self):
         return f"{self.examinee.name} - {self.exam.name}: {self.score}"
@@ -62,7 +66,7 @@ class ExamineePaper(models.Model):
         mark = "Correct" if self.mark_result else "Wrong"
         return f"{self.examinee.name} - {self.exam_paper} Q{self.question_number}: A{self.answer_number} ({mark})"
     
-class Request(models.Model):
+class ActionRequest(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     token = models.CharField(max_length=24, primary_key=True)
     action = models.CharField(max_length=64)
@@ -74,7 +78,7 @@ class Request(models.Model):
 
 class OTPRequest(models.Model):
     code = models.CharField(max_length=4)
-    request = models.ForeignKey(Request, on_delete=models.CASCADE)
+    request = models.ForeignKey(ActionRequest, on_delete=models.CASCADE)
     created_at = models.DateTimeField()
     expired_at = models.DateTimeField()
 

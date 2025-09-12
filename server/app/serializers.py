@@ -34,7 +34,7 @@ class OTPRequestSerializer(serializers.ModelSerializer):
 
 class RequestSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Request
+        model = ActionRequest
         fields = ('user', 'token', 'action', 'available', 'expired_at')
 
 class OTPVerifySerializer(serializers.Serializer):

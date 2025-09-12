@@ -34,7 +34,7 @@ class ExamViewSet(viewsets.ModelViewSet):
     
 class SendOTPForEmailVerify(APIView):
     def post(self, request):
-        action_request = Request.objects.filter(
+        action_request = ActionRequest.objects.filter(
             user = request.user,
             available = False,
             expired_at__gt = datetime.now(),
@@ -43,7 +43,7 @@ class SendOTPForEmailVerify(APIView):
 
         if action_request is None:
             token = ''.join(map(str, [randomX.base62[x] for x in randomX.randomX(24, 0, 62)]))
-            action_request = Request(user=request.user, token=token, action='email_verify', expired_at=datetime.now() + timedelta(minutes=5), available=False)
+            action_request = ActionRequest(user=request.user, token=token, action='email_verify', expired_at=datetime.now() + timedelta(minutes=5), available=False)
             action_request.save()
 
         otp_code = randomX.randomOTP()
@@ -63,7 +63,7 @@ class VerifyOTP(APIView):
         code = serializer.validated_data['code']
         token = serializer.validated_data['token']
 
-        action_request = Request.objects.filter(token=token, available=False, expired_at__gt = datetime.now()).first()
+        action_request = ActionRequest.objects.filter(token=token, available=False, expired_at__gt = datetime.now()).first()
         if action_request is None:
             return Response({"detail": "Token không hợp lệ"}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -91,7 +91,7 @@ class VerifyEmail(APIView):
 
         token = serializer.validated_data['token']
 
-        action_request = Request.objects.filter(token=token, available=True, expired_at__gt = datetime.now()).first()
+        action_request = ActionRequest.objects.filter(token=token, available=True, expired_at__gt = datetime.now()).first()
         if action_request is None:
             return Response({"detail": "Token không hợp lệ"}, status=status.HTTP_400_BAD_REQUEST)
         

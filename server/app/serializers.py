@@ -27,6 +27,21 @@ class ExamSerializer(serializers.ModelSerializer):
         model = Exam
         exclude = ('user',) # Get all field exclude 'user'
 
+class ExamAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExamAnswer
+        fields = '__all__'
+
+class ExamineeSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(
+        slug_field='username',
+        queryset=CustomUser.objects.all()
+    )
+
+    class Meta:
+        model = Examinee
+        fields = '__all__'
+
 class OTPRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = OTPRequest
@@ -43,3 +58,16 @@ class OTPVerifySerializer(serializers.Serializer):
 
 class EmailVerifySerializer(serializers.Serializer):
     token = serializers.CharField(max_length=24)
+
+class UploadImageForProcessSerializer(serializers.Serializer):
+    exam_id = serializers.CharField()
+    examinee_id = serializers.CharField()
+    image = serializers.ImageField()
+
+class GetImageUrlSerializer(serializers.Serializer):
+    image_name = serializers.CharField()
+
+class ExamineeListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExamineeList
+        fields = '__all__'

@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .permissions import IsVerificated
 from .models import *
 from .serializers import *
-from .tasks import send_otp
+from .tasks import send_otp, upload_image, get_image_url
 from app import randomX
 from datetime import datetime, timedelta
 
@@ -21,7 +21,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 class ExamViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsVerificated]
+    # permission_classes = [IsAuthenticated, IsVerificated]
     serializer_class = ExamSerializer
 
     def get_queryset(self):
@@ -32,6 +32,18 @@ class ExamViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
         return super().perform_create(serializer)
     
+class ExamAnswerViewSet(viewsets.ModelViewSet):
+    queryset = ExamAnswer.objects.all()
+    serializer_class = ExamAnswerSerializer
+
+class ExamineeViewSet(viewsets.ModelViewSet):
+    queryset = Examinee.objects.all()
+    serializer_class = ExamineeSerializer
+
+class ExamineeListViewSet(viewsets.ModelViewSet):
+    queryset = ExamineeList.objects.all()
+    serializer_class = ExamineeListSerializer
+
 class SendOTPForEmailVerify(APIView):
     def post(self, request):
         action_request = ActionRequest.objects.filter(
@@ -100,3 +112,30 @@ class VerifyEmail(APIView):
         user.save()
         action_request.delete()
         return Response({"detail": "Xác thực email thành công"}, status=status.HTTP_200_OK)
+
+class UploadImageForProcess(APIView):
+    def post(self, request):
+        serializer = UploadImageForProcessSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        exam_id = serializer.validated_data['exam_id']
+        examinee_id = serializer.validated_data['examinee_id']
+        image = serializer.validated_data['image']
+
+        examinee_record = ExamineeList(exam_id=exam_id, examinee_id=examinee_id)
+        file_name = upload_image(file=image)
+        examinee_record.score = 0 # TODO: score -> nullable
+        examinee_record.img_before_process = file_name
+        examinee_record.save()
+
+        return Response(file_name, status=status.HTTP_200_OK)
+    
+class GetImageUrl(APIView):
+    def get(self, request):
+        serializer = GetImageUrlSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        image_name = serializer.validated_data['image_name']
+        url = get_image_url(key=image_name)
+
+        return Response(url, status=status.HTTP_200_OK)

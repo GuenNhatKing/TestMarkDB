@@ -152,8 +152,8 @@ verifying_key_file = open(BASE_DIR / "certs/publickey.crt")
 verifying_key = verifying_key_file.read()
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 
     "ALGORITHM": "RS512",
     "SIGNING_KEY": signing_key,

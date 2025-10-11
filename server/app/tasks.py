@@ -4,7 +4,9 @@ from email.utils import formataddr
 from smtplib import SMTP
 from pathlib import Path
 import environ
-from app import randomX
+from datetime import datetime
+from app import s3Image, randomX
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
@@ -101,3 +103,15 @@ def send_otp(receiver, otp_code):
         smtp.send_message(message)
 
     print(f"OTP was sent for email: {receiver}!")
+
+@shared_task
+def upload_image(file):
+    file_name = randomX.randomFileName()
+    ext = os.path.splitext(file.name)[1]
+    file.name = file_name + ext
+    s3Image.upload_objfile(b2=s3Image.b2, bucket=s3Image.BUCKET_NAME, fileobj=file)
+    return file.name
+
+@shared_task
+def get_image_url(key):
+    return s3Image.get_object_presigned_url(bucket=s3Image.BUCKET_NAME, key=key, b2=s3Image.b2, expiration_seconds=60)

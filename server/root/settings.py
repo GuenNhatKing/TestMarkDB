@@ -95,7 +95,7 @@ DATABASES = {
         'HOST': env("DB_HOST"),
         'PORT': env("DB_PORT"),
         'OPTIONS': {
-            'ssl': {'ca': env("DB_SSL_CA")}
+            'ssl': {'ca': str(BASE_DIR / 'certs/ca.pem')}
         }
     }
 }

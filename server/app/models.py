@@ -29,7 +29,7 @@ class Exam(models.Model):
     def __str__(self):
         return f"{self.name} ({self.exam_date})"
 
-class ExamineeList(models.Model):
+class ExamineeRecord(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     examinee = models.ForeignKey(Examinee, on_delete=models.CASCADE)
     score = models.FloatField()

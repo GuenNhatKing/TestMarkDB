@@ -67,7 +67,7 @@ class UploadImageForProcessSerializer(serializers.Serializer):
 class GetImageUrlSerializer(serializers.Serializer):
     image_name = serializers.CharField()
 
-class ExamineeListSerializer(serializers.ModelSerializer):
+class ExamineeRecordSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ExamineeList
+        model = ExamineeRecord
         fields = '__all__'

@@ -4,6 +4,6 @@ from .models import *
 admin.site.register(Exam)
 admin.site.register(ExamAnswer)
 admin.site.register(Examinee)
-admin.site.register(ExamineeList)
+admin.site.register(ExamineeRecord)
 admin.site.register(ExamineePaper)
 admin.site.register(ExamPaper)

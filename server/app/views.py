@@ -41,8 +41,8 @@ class ExamineeViewSet(viewsets.ModelViewSet):
     serializer_class = ExamineeSerializer
 
 class ExamineeListViewSet(viewsets.ModelViewSet):
-    queryset = ExamineeList.objects.all()
-    serializer_class = ExamineeListSerializer
+    queryset = ExamineeRecord.objects.all()
+    serializer_class = ExamineeRecordSerializer
 
 class SendOTPForEmailVerify(APIView):
     def post(self, request):

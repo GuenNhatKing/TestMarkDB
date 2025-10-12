@@ -122,7 +122,7 @@ class UploadImageForProcess(APIView):
         examinee_id = serializer.validated_data['examinee_id']
         image = serializer.validated_data['image']
 
-        examinee_record = ExamineeList(exam_id=exam_id, examinee_id=examinee_id)
+        examinee_record = ExamineeRecord(exam_id=exam_id, examinee_id=examinee_id)
         file_name = upload_image(file=image)
         examinee_record.score = 0 # TODO: score -> nullable
         examinee_record.img_before_process = file_name

@@ -19,9 +19,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Environment settup
 env = environ.Env(
-    DEBUG=(bool, False)
+    DEBUG=(bool, False),
+    DJANGO_READ_DOTENV=(bool, True),
 )
-environ.Env.read_env(BASE_DIR / ".env")
+
+dotenv_path = BASE_DIR / ".env"
+if env.bool("DJANGO_READ_DOTENV", default=True) and dotenv_path.exists():
+    environ.Env.read_env(str(dotenv_path))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -32,7 +36,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [env("HOST")]
 
 
 # Application definition
@@ -91,7 +95,7 @@ DATABASES = {
         'HOST': env("DB_HOST"),
         'PORT': env("DB_PORT"),
         'OPTIONS': {
-            'ssl': {'ca': str(BASE_DIR / 'certs/ca.pem')}
+            'ssl': {'ca': env("DB_SSL_CA")}
         }
     }
 }
@@ -146,18 +150,13 @@ REST_FRAMEWORK = {
     ]
 }
 
-signing_key_file = open(BASE_DIR / "certs/pkcs8.key")
-signing_key = signing_key_file.read()
-verifying_key_file = open(BASE_DIR / "certs/publickey.crt")
-verifying_key = verifying_key_file.read()
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 
     "ALGORITHM": "RS512",
-    "SIGNING_KEY": signing_key,
-    "VERIFYING_KEY": verifying_key,
+    "SIGNING_KEY": env("JWT_SIGNING_KEY"),
+    "VERIFYING_KEY": env("JWT_VERIFYING_KEY"),
 
     "AUDIENCE": "TestMarkDBUser",
     "ISSUER": "TestMarkDB",

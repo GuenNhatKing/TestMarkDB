@@ -1,0 +1,37 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: testmarkdb
+    restart: unless-stopped
+
+    environment:
+      - DJANGO_SETTINGS_MODULE=root.settings
+    expose:
+      - "8000"
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "8800:80"
+    depends_on:
+      - web
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery-worker
+    restart: unless-stopped
+    entrypoint: ["celery"]
+    working_dir: /app/server
+    command: ["-A", "root", "worker", "--loglevel=INFO", "--pool=threads"]    
+    environment:
+      - DJANGO_SETTINGS_MODULE=root.settings
+    depends_on:
+      - web

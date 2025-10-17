@@ -1,0 +1,39 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore virtual environments
+venv/
+env/
+.venv/
+
+# Ignore git and metadata files
+.github/
+.git/
+.gitignore
+.dockerignore
+
+# Ignore log and cache files
+*.log
+*.sqlite3
+*.db
+*.pid
+
+# Ignore collected static files
+staticfiles/
+
+# Ignore secret configuration files
+.env
+.env.*
+!app/.env
+!app/.env.prod
+
+# Ignore unnecessary system files
+__MACOSX/
+*.swp
+*.bak
+.DS_Store
+
+# Ignore real certificates (if only COPY from separate build context)
+certs/

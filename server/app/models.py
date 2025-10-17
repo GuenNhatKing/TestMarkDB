@@ -32,7 +32,7 @@ class Exam(models.Model):
 class ExamineeRecord(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     examinee = models.ForeignKey(Examinee, on_delete=models.CASCADE)
-    score = models.FloatField()
+    score = models.FloatField(null=True)
     img_before_process = models.CharField(max_length=255, null=True)
     img_after_process = models.CharField(max_length=255, null=True)
     

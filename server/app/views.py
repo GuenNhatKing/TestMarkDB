@@ -124,7 +124,7 @@ class UploadImageForProcess(APIView):
 
         examinee_record = ExamineeRecord(exam_id=exam_id, examinee_id=examinee_id)
         file_name = upload_image(file=image)
-        examinee_record.score = 0 # TODO: score -> nullable
+        examinee_record.score = None
         examinee_record.img_before_process = file_name
         examinee_record.save()
 

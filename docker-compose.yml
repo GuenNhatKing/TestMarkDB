@@ -1,9 +1,14 @@
 services:
-  web:
+  app-build:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: testmarkdb
+    image: testmarkdb-app
+    profiles: ["build"]
+
+  web:
+    image: testmarkdb-app
+    container_name: web-app
     restart: unless-stopped
 
     environment:
@@ -23,9 +28,7 @@ services:
       - web
 
   celery:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: testmarkdb-app:latest
     container_name: celery-worker
     restart: unless-stopped
     entrypoint: ["celery"]

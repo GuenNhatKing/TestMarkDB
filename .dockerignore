@@ -25,9 +25,7 @@ staticfiles/
 
 # Ignore secret configuration files
 .env
-.env.*
-!app/.env
-!app/.env.prod
+*.env
 
 # Ignore unnecessary system files
 __MACOSX/
@@ -37,3 +35,13 @@ __MACOSX/
 
 # Ignore real certificates (if only COPY from separate build context)
 certs/
+
+# Ignore build artifacts
+build/
+dist/
+*.egg-info/
+
+# Ignore coverage/test reports
+.coverage
+htmlcov/
+pytest_cache/

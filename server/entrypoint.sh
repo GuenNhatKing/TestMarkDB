@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-if [ -f "./server/.prod.env" ]; then
-  export DOTENV_PATH="./server/.prod.env"
-else
-  export DOTENV_PATH="./server/.env"
-fi
-
 python ./server/manage.py collectstatic --noinput
 
 python ./server/manage.py makemigrations --noinput || true

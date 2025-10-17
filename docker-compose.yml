@@ -1,12 +1,8 @@
 services:
-  app-build:
+  web:
     build:
       context: .
       dockerfile: Dockerfile
-    image: testmarkdb-app
-    profiles: ["build"]
-
-  web:
     image: testmarkdb-app
     container_name: web-app
     restart: unless-stopped
@@ -15,6 +11,11 @@ services:
       - DJANGO_SETTINGS_MODULE=root.settings
     expose:
       - "8000"
+      
+    env_file:
+      - ./.env
+    volumes:
+      - ./server/certs/:/app/server/certs:ro
 
   nginx:
     build:
@@ -28,7 +29,7 @@ services:
       - web
 
   celery:
-    image: testmarkdb-app:latest
+    image: testmarkdb-app
     container_name: celery-worker
     restart: unless-stopped
     entrypoint: ["celery"]
@@ -36,5 +37,11 @@ services:
     command: ["-A", "root", "worker", "--loglevel=INFO", "--pool=threads"]    
     environment:
       - DJANGO_SETTINGS_MODULE=root.settings
+    
+    env_file:
+      - ./.env
+    volumes:
+      - ./server/certs/:/app/server/certs:ro
+
     depends_on:
       - web

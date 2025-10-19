@@ -5,8 +5,8 @@ from .views import *
 router = DefaultRouter()
 router.register('Users', UserViewSet, basename='User')
 router.register('Exams', ExamViewSet, basename='Exam')
-router.register('ExamineeLists', ExamineeListViewSet, basename='ExamineeList')
-router.register('Examinees', ExamineeViewSet, basename='Examinees')
+router.register('ExamineeRecords', ExamineeListViewSet, basename='ExamineeRecord')
+router.register('Examinees', ExamineeViewSet, basename='Examinee')
 router.register('ExamAnswers', ExamAnswerViewSet, basename='ExamAnswer')
 
 urlpatterns = [

@@ -50,3 +50,4 @@ jobs:
             run: az webapp restart --name testmarkdb --resource-group testmarkdb
           - name: Restart Celery
             run: az webapp restart --name testmarkdb-celery --resource-group testmarkdb
+            

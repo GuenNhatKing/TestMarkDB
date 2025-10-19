@@ -10,8 +10,6 @@ services:
       - DJANGO_SETTINGS_MODULE=root.settings
     expose:
       - "8000"
-    volumes:
-      - ./server/certs/:/app/server/certs:ro
 
   nginx:
     build:
@@ -31,7 +29,5 @@ services:
     restart: unless-stopped
     environment:
       - DJANGO_SETTINGS_MODULE=root.settings
-    volumes:
-      - ./server/certs/:/app/server/certs:ro
     depends_on:
       - web

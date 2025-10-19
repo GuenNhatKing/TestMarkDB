@@ -10,15 +10,10 @@ from .tasks import send_otp, upload_image, get_image_url
 from app import randomX
 from datetime import datetime, timedelta
 
-# Create your views here.
 class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     queryset = CustomUser.objects.all()
     serializer_class = UserRegisterSerializer
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
 
 class ExamViewSet(viewsets.ModelViewSet):
     # permission_classes = [IsAuthenticated, IsVerificated]
@@ -32,15 +27,11 @@ class ExamViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
         return super().perform_create(serializer)
     
-class ExamAnswerViewSet(viewsets.ModelViewSet):
-    queryset = ExamAnswer.objects.all()
-    serializer_class = ExamAnswerSerializer
-
 class ExamineeViewSet(viewsets.ModelViewSet):
     queryset = Examinee.objects.all()
     serializer_class = ExamineeSerializer
 
-class ExamineeListViewSet(viewsets.ModelViewSet):
+class ExamineeRecordViewSet(viewsets.ModelViewSet):
     queryset = ExamineeRecord.objects.all()
     serializer_class = ExamineeRecordSerializer
 

@@ -30,3 +30,17 @@ jobs:
 
           - name: Push with Compose
             run: docker compose -f docker-compose.prod.yml push
+
+    restart-webapp:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Login to Azure
+            uses: azure/login@v2
+            with:
+                client-id: ${{ secrets.AZURE_CLIENT_ID }}
+                tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          - name: Restart Web App
+            run: az webapp restart --name testmarkdb --resource-group testmarkdb
+          - name: Restart Celery
+            run: az webapp restart --name testmarkdb-celery --resource-group testmarkdb

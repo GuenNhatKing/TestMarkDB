@@ -4,7 +4,6 @@ services:
       context: .
       dockerfile: Dockerfile
     image: ${ACR}/testmarkdb-app
-    container_name: web-app
     restart: unless-stopped
     environment:
       - DJANGO_SETTINGS_MODULE=root.settings
@@ -16,16 +15,12 @@ services:
       context: ./nginx
       dockerfile: Dockerfile
     image: ${ACR}/testmarkdb-nginx
-    container_name: nginx-proxy
     restart: unless-stopped
-    ports:
-      - "8800:80"
     depends_on:
       - web
 
   celery:
-    image: testmarkdb-app
-    container_name: celery-worker
+    image: ${ACR}/testmarkdb-app
     restart: unless-stopped
     environment:
       - DJANGO_SETTINGS_MODULE=root.settings

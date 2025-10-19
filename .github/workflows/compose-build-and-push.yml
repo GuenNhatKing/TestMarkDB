@@ -11,32 +11,32 @@ env:
     PASSWORD: ${{ secrets.ACR_PASSWORD }}
 
 jobs:
-    # build-push:
-    #     runs-on: ubuntu-latest
-    #     permissions:
-    #       contents: read #This is required for actions/checkout
-    #     steps:
-    #       - name: Checkout
-    #         uses: actions/checkout@v4
+    build-push:
+        runs-on: ubuntu-latest
+        permissions:
+          contents: read #This is required for actions/checkout
+        steps:
+          - name: Checkout
+            uses: actions/checkout@v4
 
-    #       - name: Set up Buildx
-    #         uses: docker/setup-buildx-action@v3
+          - name: Set up Buildx
+            uses: docker/setup-buildx-action@v3
 
-    #       - name: Login to ACR
-    #         uses: docker/login-action@v3
-    #         with:
-    #             registry: ${{ env.ACR }}
-    #             username: ${{ env.USERNAME }}
-    #             password: ${{ env.PASSWORD }}
-    #       - name: Build with Compose
-    #         run: docker compose -f docker-compose.prod.yml build --pull
+          - name: Login to ACR
+            uses: docker/login-action@v3
+            with:
+                registry: ${{ env.ACR }}
+                username: ${{ env.USERNAME }}
+                password: ${{ env.PASSWORD }}
+          - name: Build with Compose
+            run: docker compose -f docker-compose.prod.yml build --pull
 
-    #       - name: Push with Compose
-    #         run: docker compose -f docker-compose.prod.yml push
+          - name: Push with Compose
+            run: docker compose -f docker-compose.prod.yml push
 
     restart-webapp:
         runs-on: ubuntu-latest
-        # needs: build-push
+        needs: build-push
         permissions:
           id-token: write #This is required for requesting the JWT
         steps:

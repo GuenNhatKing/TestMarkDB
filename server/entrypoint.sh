@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-python ./server/manage.py collectstatic --noinput
+cd /app/server
 
-python ./server/manage.py makemigrations --noinput || true
-python ./server/manage.py migrate --noinput
+python ./manage.py collectstatic --noinput
 
-uwsgi --ini ./server/uwsgi.ini
+python ./manage.py makemigrations --noinput || true
+python ./manage.py migrate --noinput
+
+exec "$@"

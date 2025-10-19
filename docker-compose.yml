@@ -6,12 +6,11 @@ services:
     image: testmarkdb-app
     container_name: web-app
     restart: unless-stopped
-
     environment:
       - DJANGO_SETTINGS_MODULE=root.settings
+    command: ["uwsgi", "--ini", "./uwsgi.ini"]    
     expose:
       - "8000"
-      
     env_file:
       - ./.env
     volumes:
@@ -32,16 +31,12 @@ services:
     image: testmarkdb-app
     container_name: celery-worker
     restart: unless-stopped
-    entrypoint: ["celery"]
-    working_dir: /app/server
-    command: ["-A", "root", "worker", "--loglevel=INFO", "--pool=threads"]    
     environment:
       - DJANGO_SETTINGS_MODULE=root.settings
-    
+    command: ["celery", "-A", "root", "worker", "--loglevel=INFO", "--pool=threads"]    
     env_file:
       - ./.env
     volumes:
       - ./server/certs/:/app/server/certs:ro
-
     depends_on:
       - web

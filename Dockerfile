@@ -22,4 +22,5 @@ EXPOSE 8000
 RUN chown -R app:app /app
 USER app
 
+RUN chmod +x ./server/entrypoint.sh
 ENTRYPOINT ["./server/entrypoint.sh"]

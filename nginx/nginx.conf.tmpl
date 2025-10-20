@@ -9,6 +9,10 @@ http {
     sendfile on;
     keepalive_timeout 65;
 
+    upstream backend {
+        server ${UPSTREAM};
+    }
+
     server {
         listen 80;
         server_name _;
@@ -18,7 +22,7 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_read_timeout 300;
-            proxy_pass http://127.0.0.1:8000;
+            proxy_pass http://backend;
         }
     }
 }

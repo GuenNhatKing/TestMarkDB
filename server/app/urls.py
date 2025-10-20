@@ -26,6 +26,7 @@ urlpatterns = [
     path("api/VerifyOTP", VerifyOTP.as_view(), name="VerifyOTP"),
     path("api/VerifyEmail", VerifyEmail.as_view(), name="VerifyEmail"),
     
+    path("api/UploadImage", UploadImage.as_view(), name="UploadImage"),
     path("api/GetImageUrl", GetImageUrl.as_view(), name="GetImageUrl"),
     
     path("api/", include(router.urls)),

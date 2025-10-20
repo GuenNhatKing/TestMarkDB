@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .permissions import IsVerificated
 from .models import *
 from .serializers import *
-from .tasks import send_otp, upload_image, get_image_url
+from .tasks import send_otp, get_image_url
 from app import randomX
 from datetime import datetime, timedelta
 
@@ -137,23 +137,6 @@ class VerifyEmail(APIView):
         user.save()
         action_request.delete()
         return Response({"detail": "Xác thực email thành công"}, status=status.HTTP_200_OK)
-
-class UploadImageForProcess(APIView):
-    def post(self, request):
-        serializer = UploadImageForProcessSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        exam_id = serializer.validated_data['exam_id']
-        examinee_id = serializer.validated_data['examinee_id']
-        image = serializer.validated_data['image']
-
-        examinee_record = ExamineeRecord(exam_id=exam_id, examinee_id=examinee_id)
-        file_name = upload_image(file=image)
-        examinee_record.score = None
-        examinee_record.img_before_process = file_name
-        examinee_record.save()
-
-        return Response(file_name, status=status.HTTP_200_OK)
     
 class GetImageUrl(APIView):
     def get(self, request):

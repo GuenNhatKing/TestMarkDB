@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import *
+from django.db import transaction
+from .tasks import upload_image, get_image_url
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -80,9 +82,40 @@ class GetImageUrlSerializer(serializers.Serializer):
     image_name = serializers.CharField()
 
 class ExamineeRecordSerializer(serializers.ModelSerializer):
+    # input: nhận file từ multipart/form-data
+    img_before_process_input = serializers.ImageField(write_only=True, required=False)
+    img_after_process_input  = serializers.ImageField(write_only=True, required=False)
+
+    # stored: chuỗi để client thấy được giá trị đã lưu
+    img_before_process = serializers.CharField(read_only=True) 
+    img_after_process  = serializers.CharField(read_only=True)
     class Meta:
         model = ExamineeRecord
         fields = '__all__'
         extra_kwargs = {
             'exam': {'read_only': True} 
         }
+    
+    @transaction.atomic
+    def create(self, validated_data):
+        img_before_file = validated_data.pop("img_before_process_input", None)
+        img_after_file  = validated_data.pop("img_after_process_input", None)
+        
+        if img_before_file:
+            validated_data["img_before_process"] = upload_image(file=img_before_file) 
+        if img_after_file:
+            validated_data["img_after_process"] = upload_image(file=img_after_file) 
+
+        return super().create(validated_data)
+    
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        img_before_file = validated_data.pop("img_before_process_input", None)
+        img_after_file  = validated_data.pop("img_after_process_input", None)
+
+        if img_before_file:
+            instance.img_before_process = upload_image(file=img_before_file)
+        if img_after_file:
+            instance.img_after_process = upload_image(file=img_after_file)
+
+        return super().update(instance, validated_data)

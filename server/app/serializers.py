@@ -25,22 +25,34 @@ class UserSerializer(serializers.ModelSerializer):
 class ExamSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Exam
-        exclude = ('user',) # Get all field exclude 'user'
+        fields = '__all__'
+        extra_kwargs = {
+            'user': {'read_only': True} 
+        }
+
+class ExamPaperSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = ExamPaper
+        fields = '__all__'
+        extra_kwargs = {
+            'exam': {'read_only': True} 
+        }
 
 class ExamAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExamAnswer
         fields = '__all__'
+        extra_kwargs = {
+            'exam_paper': {'read_only': True} 
+        }
 
 class ExamineeSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(
-        slug_field='username',
-        queryset=CustomUser.objects.all()
-    )
-
     class Meta:
         model = Examinee
         fields = '__all__'
+        extra_kwargs = {
+            'user': {'read_only': True} 
+        }
 
 class OTPRequestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -71,3 +83,6 @@ class ExamineeRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExamineeRecord
         fields = '__all__'
+        extra_kwargs = {
+            'exam': {'read_only': True} 
+        }

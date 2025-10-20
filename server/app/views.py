@@ -25,14 +25,49 @@ class ExamViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+class ExamPaperViewSet(viewsets.ModelViewSet):
+    serializer_class = ExamPaperSerializer
+
+    def get_queryset(self):
+        exam = Exam.objects.get(pk=self.kwargs['exam_pk'])
+        return ExamPaper.objects.filter(exam=exam)
+
+    def perform_create(self, serializer):
+        exam = Exam.objects.get(pk=self.kwargs['exam_pk'])
+        serializer.save(exam=exam)
+
+class ExamAnswerViewSet(viewsets.ModelViewSet):
+    serializer_class = ExamAnswerSerializer
+
+    def get_queryset(self):
+        exam_paper = ExamPaper.objects.get(pk=self.kwargs['exam_paper_pk'])
+        return ExamAnswer.objects.filter(exam_paper=exam_paper)
+
+    def perform_create(self, serializer):
+        exam_paper = ExamPaper.objects.get(pk=self.kwargs['exam_paper_pk'])
+        serializer.save(exam_paper=exam_paper)
     
 class ExamineeViewSet(viewsets.ModelViewSet):
-    queryset = Examinee.objects.all()
     serializer_class = ExamineeSerializer
 
+    def get_queryset(self):
+        queryset = Examinee.objects.filter(user=self.request.user)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 class ExamineeRecordViewSet(viewsets.ModelViewSet):
-    queryset = ExamineeRecord.objects.all()
     serializer_class = ExamineeRecordSerializer
+
+    def get_queryset(self):
+        exam = Exam.objects.get(pk=self.kwargs['exam_pk'])
+        return ExamineeRecord.objects.filter(exam=exam)
+
+    def perform_create(self, serializer):
+        exam = Exam.objects.get(pk=self.kwargs['exam_pk'])
+        serializer.save(exam=exam)
 
 class SendOTPForEmailVerify(APIView):
     def post(self, request):
@@ -59,7 +94,7 @@ class SendOTPForEmailVerify(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
 class VerifyOTP(APIView):
-    def patch(self, request):
+    def post(self, request):
         serializer = OTPVerifySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         code = serializer.validated_data['code']
@@ -87,7 +122,7 @@ class VerifyOTP(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class VerifyEmail(APIView):
-    def patch(self, request):
+    def post(self, request):
         serializer = EmailVerifySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

@@ -28,6 +28,7 @@ urlpatterns = [
     
     path("api/UploadImage", UploadImage.as_view(), name="UploadImage"),
     path("api/GetImageUrl", GetImageUrl.as_view(), name="GetImageUrl"),
+    
     path("api/", include(router.urls)),
     path("api/", include(exam_paper_router.urls)),
     path("api/", include(exam_answer_router.urls)),

@@ -73,9 +73,7 @@ class OTPVerifySerializer(serializers.Serializer):
 class EmailVerifySerializer(serializers.Serializer):
     token = serializers.CharField(max_length=24)
 
-class UploadImageForProcessSerializer(serializers.Serializer):
-    exam_id = serializers.CharField()
-    examinee_id = serializers.CharField()
+class UploadImageSerializer(serializers.Serializer):
     image = serializers.ImageField()
 
 class GetImageUrlSerializer(serializers.Serializer):

@@ -147,3 +147,12 @@ class GetImageUrl(APIView):
         url = get_image_url(key=image_name)
 
         return Response(url, status=status.HTTP_200_OK)
+
+class UploadImage(APIView):
+    permission_classes = []
+    def post(self, request):
+        serializer = UploadImageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        image = serializer.validated_data['image']
+        file_name = upload_image(file=image)
+        return Response(file_name, status=status.HTTP_200_OK)

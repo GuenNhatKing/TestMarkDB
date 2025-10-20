@@ -6,7 +6,7 @@ from .views import *
 router = DefaultRouter()
 
 router.register('Exams', ExamViewSet, basename='exam')
-router.register('ExamPapers', ExamViewSet, basename='exam_paper')
+router.register('ExamPapers', ExamPaperViewSet, basename='exam_paper')
 router.register('Examinees', ExamineeViewSet, basename='examinee')
 router.register('ExamineeRecords', ExamineeRecordViewSet, basename='examinee_record')
 

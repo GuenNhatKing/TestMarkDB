@@ -74,7 +74,6 @@ class EmailVerifySerializer(serializers.Serializer):
     token = serializers.CharField(max_length=24)
 
 class CameraStreamSerializer(serializers.Serializer):
-    id = serializers.CharField(required=True)
     image = serializers.ImageField(required=True)
 
 class ImageUrlSerializer(serializers.Serializer):

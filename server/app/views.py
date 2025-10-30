@@ -151,6 +151,7 @@ class ImageUrl(APIView):
         return Response(url, status=status.HTTP_200_OK)
 
 class CameraStream(APIView):
+    permission_classes = []
     def get(self, request, id):
         data, ts = get_camera_stream(id)
         if not data:

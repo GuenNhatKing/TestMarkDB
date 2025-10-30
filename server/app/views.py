@@ -6,9 +6,11 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .permissions import IsVerificated
 from .models import *
 from .serializers import *
-from .tasks import send_otp, get_image_url
+from .tasks import send_otp, get_image_url, get_camera_stream, update_camera_stream
 from app import randomX
 from datetime import datetime, timedelta
+import time
+from django.http import HttpResponse, Http404
 
 class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
@@ -138,9 +140,9 @@ class VerifyEmail(APIView):
         action_request.delete()
         return Response({"detail": "Xác thực email thành công"}, status=status.HTTP_200_OK)
     
-class GetImageUrl(APIView):
+class ImageUrl(APIView):
     def get(self, request):
-        serializer = GetImageUrlSerializer(data=request.data)
+        serializer = ImageUrlSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         image_name = serializer.validated_data['image_name']
@@ -148,11 +150,21 @@ class GetImageUrl(APIView):
 
         return Response(url, status=status.HTTP_200_OK)
 
-class UploadImage(APIView):
-    permission_classes = []
-    def post(self, request):
-        serializer = UploadImageSerializer(data=request.data)
+class CameraStream(APIView):
+    def get(self, request, id):
+        data, ts = get_camera_stream(id)
+        if not data:
+            raise Http404("Không có ảnh cho ID này")
+        resp = HttpResponse(data, content_type="image/jpeg")
+        resp["X-Timestamp"] = str(ts or 0)
+        return resp
+    
+    def put(self, request, id):
+        serializer = CameraStreamSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        image = serializer.validated_data['image']
-        file_name = upload_image(file=image)
-        return Response(file_name, status=status.HTTP_200_OK)
+        image = serializer.validated_data["image"]
+        data = image.read()
+        ts = int(time.time())
+        update_camera_stream(id, data, ts)
+        return Response({"ok": True, "id": id, "timestamp": ts}, status=status.HTTP_200_OK)
+

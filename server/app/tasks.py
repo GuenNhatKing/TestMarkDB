@@ -4,9 +4,9 @@ from email.utils import formataddr
 from smtplib import SMTP
 from pathlib import Path
 import environ
-from datetime import datetime
 from app import s3Image, randomX
 import os
+from django.core.cache import cache
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
@@ -115,3 +115,20 @@ def upload_image(file):
 @shared_task
 def get_image_url(key):
     return s3Image.get_object_presigned_url(bucket=s3Image.BUCKET_NAME, key=key, b2=s3Image.b2, expiration_seconds=60)
+
+def key_value_data(id) -> str: 
+    return f"img:{{{id}}}:data"
+
+def key_value_ts(id) -> str: 
+    return f"img:{{{id}}}:ts"
+
+@shared_task
+def get_camera_stream(id):
+    data = cache.get(key_value_data(id))
+    ts = cache.get(key_value_ts(id))
+    return data, ts
+
+@shared_task
+def update_camera_stream(id, data, ts):
+    cache.set(key_value_data(id), data, timeout=None)
+    cache.set(key_value_ts(id), ts, timeout=None)

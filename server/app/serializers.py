@@ -73,11 +73,12 @@ class OTPVerifySerializer(serializers.Serializer):
 class EmailVerifySerializer(serializers.Serializer):
     token = serializers.CharField(max_length=24)
 
-class UploadImageSerializer(serializers.Serializer):
-    image = serializers.ImageField()
+class CameraStreamSerializer(serializers.Serializer):
+    id = serializers.CharField(required=True)
+    image = serializers.ImageField(required=True)
 
-class GetImageUrlSerializer(serializers.Serializer):
-    image_name = serializers.CharField()
+class ImageUrlSerializer(serializers.Serializer):
+    image_name = serializers.CharField(required=True)
 
 class ExamineeRecordSerializer(serializers.ModelSerializer):
     # input: nhận file từ multipart/form-data

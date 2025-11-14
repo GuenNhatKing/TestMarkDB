@@ -117,3 +117,12 @@ class ExamineeRecordSerializer(serializers.ModelSerializer):
             instance.img_after_process = upload_image(file=img_after_file)
 
         return super().update(instance, validated_data)
+    
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+class ImageProcessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExamineeRecord
+        fields = '__all__'

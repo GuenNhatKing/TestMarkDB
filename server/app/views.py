@@ -6,11 +6,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .permissions import IsVerificated
 from .models import *
 from .serializers import *
-from .tasks import send_otp, get_image_url, get_camera_stream, update_camera_stream
+from .tasks import *
 from app import randomX
 from datetime import datetime, timedelta
 import time
 from django.http import HttpResponse, Http404
+from AI.TestMark import No_Le_AI
 
 class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
@@ -169,4 +170,37 @@ class CameraStream(APIView):
         update_camera_stream(id, data, ts)
         return Response({"ok": True, "id": id, "timestamp": ts}, status=status.HTTP_200_OK)
 
-# TODO: Change Password
+class ChangePasswordView(APIView):
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        old_password = serializer.validated_data['old_password']
+        new_password = serializer.validated_data['new_password']
+
+        user = request.user
+        if not user.check_password(old_password):
+            return Response({"detail": "Mật khẩu cũ không đúng"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.set_password(new_password)
+        user.save()
+
+        return Response({"detail": "Đổi mật khẩu thành công"}, status=status.HTTP_200_OK)
+    
+class ImageProcessView(APIView):
+    def post(self, request):
+        imageProcessSerializer = ImageProcessSerializer(data=request.data)
+        imageProcessSerializer.is_valid(raise_exception=True)
+
+        examineeRecord_id = imageProcessSerializer.validated_data.get('id', None)
+        examineeRecord = ExamineeRecord.objects.filter(id=examineeRecord_id).first() if examineeRecord_id else None
+        image_name = examineeRecord.img_before_process if examineeRecord else None
+        if not image_name:
+            return Response({"detail": "Không tìm thấy hình ảnh để xử lý"}, status=status.HTTP_400_BAD_REQUEST)
+
+        download_file(local_name=image_name, key_name=image_name)
+        ai = No_Le_AI(str_path_image="./temporary/" + image_name)
+        result = ai.process_image()
+        remove_file(local_name=image_name)
+        return Response(result, status=status.HTTP_200_OK)
+        

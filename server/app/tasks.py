@@ -113,6 +113,10 @@ def upload_image(file):
     return file.name
 
 @shared_task
+def download_file(local_name, key_name):
+    s3Image.download_file(b2=s3Image.b2, bucket=s3Image.BUCKET_NAME, directory=str(s3Image.BASE_DIR / "temporary"), local_name=local_name, key_name=key_name)
+
+@shared_task
 def get_image_url(key):
     return s3Image.get_object_presigned_url(bucket=s3Image.BUCKET_NAME, key=key, b2=s3Image.b2, expiration_seconds=60)
 
@@ -132,3 +136,9 @@ def get_camera_stream(id):
 def update_camera_stream(id, data, ts):
     cache.set(key_value_data(id), data, timeout=None)
     cache.set(key_value_ts(id), ts, timeout=None)
+
+@shared_task
+def remove_file(local_name):
+    file_path = s3Image.BASE_DIR / "temporary" / local_name
+    if os.path.exists(file_path):
+        os.remove(file_path)

@@ -13,6 +13,7 @@ class CustomUser(AbstractUser):
 class Examinee(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=127)
+    student_ID = models.CharField(max_length=10, unique=True)
     date_of_birth = models.DateField()
 
     def __str__(self):

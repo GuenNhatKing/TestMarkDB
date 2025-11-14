@@ -169,3 +169,4 @@ class CameraStream(APIView):
         update_camera_stream(id, data, ts)
         return Response({"ok": True, "id": id, "timestamp": ts}, status=status.HTTP_200_OK)
 
+# TODO: Change Password

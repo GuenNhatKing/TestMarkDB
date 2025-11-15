@@ -91,7 +91,8 @@ class ExamineeRecordSerializer(serializers.ModelSerializer):
         model = ExamineeRecord
         fields = '__all__'
         extra_kwargs = {
-            'exam': {'read_only': True} 
+            'exam': {'read_only': True}, 
+            'examinee': {'read_only': True}
         }
     
     @transaction.atomic
@@ -100,9 +101,9 @@ class ExamineeRecordSerializer(serializers.ModelSerializer):
         img_after_file  = validated_data.pop("img_after_process_input", None)
         
         if img_before_file:
-            validated_data["img_before_process"] = upload_image(file=img_before_file) 
+            validated_data["img_before_process"] = upload_image.delay(file=img_before_file) 
         if img_after_file:
-            validated_data["img_after_process"] = upload_image(file=img_after_file) 
+            validated_data["img_after_process"] = upload_image.delay(file=img_after_file) 
 
         return super().create(validated_data)
     
@@ -112,9 +113,9 @@ class ExamineeRecordSerializer(serializers.ModelSerializer):
         img_after_file  = validated_data.pop("img_after_process_input", None)
 
         if img_before_file:
-            instance.img_before_process = upload_image(file=img_before_file)
+            instance.img_before_process = upload_image.delay(file=img_before_file)
         if img_after_file:
-            instance.img_after_process = upload_image(file=img_after_file)
+            instance.img_after_process = upload_image.delay(file=img_after_file)
 
         return super().update(instance, validated_data)
     

@@ -7,6 +7,7 @@ import environ
 from app import s3Image, randomX
 import os
 from django.core.cache import cache
+from AI.ai import No_Le_AI
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
@@ -112,11 +113,6 @@ def upload_image(file):
     s3Image.upload_objfile(b2=s3Image.b2, bucket=s3Image.BUCKET_NAME, fileobj=file)
     return file.name
 
-@shared_task
-def download_file(local_name, key_name):
-    s3Image.download_file(b2=s3Image.b2, bucket=s3Image.BUCKET_NAME, directory=str(s3Image.BASE_DIR / "temporary"), local_name=local_name, key_name=key_name)
-
-@shared_task
 def get_image_url(key):
     return s3Image.get_object_presigned_url(bucket=s3Image.BUCKET_NAME, key=key, b2=s3Image.b2, expiration_seconds=60)
 
@@ -126,19 +122,26 @@ def key_value_data(id) -> str:
 def key_value_ts(id) -> str: 
     return f"img:{{{id}}}:ts"
 
-@shared_task
 def get_camera_stream(id):
     data = cache.get(key_value_data(id))
     ts = cache.get(key_value_ts(id))
     return data, ts
 
-@shared_task
 def update_camera_stream(id, data, ts):
     cache.set(key_value_data(id), data, timeout=None)
     cache.set(key_value_ts(id), ts, timeout=None)
 
-@shared_task
-def remove_file(local_name):
+def download_file(local_name, key_name):
+    s3Image.download_file(b2=s3Image.b2, bucket=s3Image.BUCKET_NAME, directory=str(s3Image.BASE_DIR / "temporary"), local_name=local_name, key_name=key_name)
+
+def remove_temporary_file(local_name):
     file_path = s3Image.BASE_DIR / "temporary" / local_name
     if os.path.exists(file_path):
         os.remove(file_path)
+
+def process_image(local_name):
+    download_file(local_name, local_name) 
+    ai = No_Le_AI()
+    result = ai.process(str(s3Image.BASE_DIR / "temporary" / local_name))
+    remove_temporary_file(local_name)
+    return result

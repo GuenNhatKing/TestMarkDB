@@ -11,4 +11,6 @@ def randomOTP():
     return ''.join(map(str, [x for x in randomX(4, 0, 10)]))
 
 def randomFileName():
-    return f'{str(time.time())}.{''.join(map(str, [base62[x] for x in randomX(24, 0, 62)]))}'
+    ts = str(time.time())
+    rand = ''.join(base62[x] for x in randomX(24, 0, 62))
+    return f"{ts}.{rand}"

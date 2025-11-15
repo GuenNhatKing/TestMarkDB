@@ -1,4 +1,6 @@
+from celery.result import AsyncResult
 from django.shortcuts import render
+from django.db.models import Count
 from rest_framework import generics, status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,7 +13,6 @@ from app import randomX
 from datetime import datetime, timedelta
 import time
 from django.http import HttpResponse, Http404
-from AI.TestMark import No_Le_AI
 
 class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
@@ -23,7 +24,7 @@ class ExamViewSet(viewsets.ModelViewSet):
     serializer_class = ExamSerializer
 
     def get_queryset(self):
-        queryset = Exam.objects.filter(user=self.request.user)
+        queryset = Exam.objects.filter(user=self.request.user).annotate(paper_count=Count('exampaper'))
         return queryset
 
     def perform_create(self, serializer):
@@ -72,6 +73,17 @@ class ExamineeRecordViewSet(viewsets.ModelViewSet):
         exam = Exam.objects.get(pk=self.kwargs['exam_pk'])
         serializer.save(exam=exam)
 
+class Examinee_RecordViewSet(viewsets.ModelViewSet):
+    serializer_class = ExamineeRecordSerializer
+
+    def get_queryset(self):
+        examinee = Examinee.objects.get(pk=self.kwargs['examinee_pk'])
+        return ExamineeRecord.objects.filter(examinee=examinee)
+
+    def perform_create(self, serializer):
+        examinee = Examinee.objects.get(pk=self.kwargs['examinee_pk'])
+        serializer.save(examinee=examinee)
+
 class SendOTPForEmailVerify(APIView):
     def post(self, request):
         action_request = ActionRequest.objects.filter(
@@ -92,7 +104,7 @@ class SendOTPForEmailVerify(APIView):
 
         serializer = OTPRequestSerializer(otp_request)
 
-        send_otp.delay_on_commit(action_request.user.email, otp_code)
+        send_otp.delay(action_request.user.email, otp_code)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
@@ -170,7 +182,7 @@ class CameraStream(APIView):
         update_camera_stream(id, data, ts)
         return Response({"ok": True, "id": id, "timestamp": ts}, status=status.HTTP_200_OK)
 
-class ChangePasswordView(APIView):
+class ChangePassword(APIView):
     def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -187,20 +199,18 @@ class ChangePasswordView(APIView):
 
         return Response({"detail": "Đổi mật khẩu thành công"}, status=status.HTTP_200_OK)
     
-class ImageProcessView(APIView):
+class ImageProcess(APIView):
     def post(self, request):
         imageProcessSerializer = ImageProcessSerializer(data=request.data)
         imageProcessSerializer.is_valid(raise_exception=True)
 
-        examineeRecord_id = imageProcessSerializer.validated_data.get('id', None)
-        examineeRecord = ExamineeRecord.objects.filter(id=examineeRecord_id).first() if examineeRecord_id else None
+        exam_id = imageProcessSerializer.validated_data.get('exam', None)
+        examinee_id = imageProcessSerializer.validated_data.get('examinee', None)
+        examineeRecord = ExamineeRecord.objects.filter(exam_id=exam_id, examinee_id=examinee_id).first() if exam_id and examinee_id else None
         image_name = examineeRecord.img_before_process if examineeRecord else None
         if not image_name:
             return Response({"detail": "Không tìm thấy hình ảnh để xử lý"}, status=status.HTTP_400_BAD_REQUEST)
 
-        download_file(local_name=image_name, key_name=image_name)
-        ai = No_Le_AI(str_path_image="./temporary/" + image_name)
-        result = ai.process_image()
-        remove_file(local_name=image_name)
-        return Response(result, status=status.HTTP_200_OK)
+        result = process_image(image_name)
+        return Response(result, status=200)
         
